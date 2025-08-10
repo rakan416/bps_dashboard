@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% block title %}Upload Riwayat Transaksi{% endblock %}
+
+{% block content %}
+<div class="form-container">
+    <div id="loader-overlay">
+        <div class="spinner"></div>
+        <p>Sedang memproses, mohon tunggu...</p>
+    </div>
+    <h2>Upload File Excel</h2>
+    
+    <form method="post" enctype="multipart/form-data" id="upload-form">
+        <div class="form-group">
+            <label for="file_excel">Pilih File Excel Alokasi</label>
+            <input 
+                type="file" 
+                id="alokasi" 
+                name="alokasi" 
+                required
+                accept=".xlsx, .xls">
+
+            <label for="file_excel">Pilih File Excel Landmark</label>
+            <input 
+                type="file" 
+                id="landmark" 
+                name="landmark" 
+                required
+                accept=".xlsx, .xls">
+
+            <label for="file_excel">Pilih File Excel REKAP LKM</label>
+            <input 
+                type="file" 
+                id="rekap_lkm" 
+                name="rekap_lkm" 
+                required
+                accept=".xlsx, .xls">
+        </div>
+        <button type="submit">Upload dan Proses</button>
+    </form>
+</div>
+
+<script>
+    // 1. Dapatkan elemen form dan loader
+    const uploadForm = document.getElementById('upload-form');
+    const loaderOverlay = document.getElementById('loader-overlay');
+
+    // 2. Tambahkan event listener saat form di-submit
+    uploadForm.addEventListener('submit', function() {
+        // Saat tombol 'Upload' diklik dan form akan dikirim,
+        // tampilkan lapisan loader.
+        loaderOverlay.style.display = 'flex';
+    });
+</script>
+
+{% endblock %}

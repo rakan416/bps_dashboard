@@ -1,0 +1,276 @@
+/* Variabel Warna untuk kemudahan kustomisasi */
+:root {
+    --primary-color: #007bff;
+    --primary-hover: #0056b3;
+    --background-color: #f8f9fa;
+    --text-color: #333;
+    --card-bg: #ffffff;
+    --border-color: #dee2e6;
+    --flash-success-bg: #d4edda;
+    --flash-success-border: #c3e6cb;
+    --flash-success-text: #155724;
+    --flash-error-bg: #f8d7da;
+    --flash-error-border: #f5c6cb;
+    --flash-error-text: #721c24;
+}
+
+body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+    margin: 0;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    line-height: 1.6;
+}
+
+/* Container utama untuk memusatkan konten */
+.container {
+    max-width: 960px;
+    margin: 0 auto;
+    padding: 1.5em;
+}
+
+/* Desain Navbar */
+nav {
+    background-color: var(--card-bg);
+    padding: 1em 2em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid var(--border-color);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+}
+
+nav .nav-left a {
+    font-weight: bold;
+    font-size: 1.2em;
+    color: var(--primary-color);
+    text-decoration: none;
+}
+
+nav .nav-right a {
+    margin-left: 1.5em;
+    text-decoration: none;
+    color: var(--text-color);
+    padding: 0.5em 0;
+    transition: color 0.2s ease-in-out;
+}
+
+nav .nav-right a:hover {
+    color: var(--primary-color);
+}
+
+/* Pesan Flash yang lebih baik */
+.flash {
+    list-style: none;
+    padding: 1em;
+    margin: 1em 0;
+    border: 1px solid;
+    border-radius: 5px;
+}
+.flash li {
+    padding: 0;
+    margin: 0;
+}
+
+/* Styling untuk kategori pesan yang berbeda */
+.flash.success {
+    background-color: var(--flash-success-bg);
+    border-color: var(--flash-success-border);
+    color: var(--flash-success-text);
+}
+.flash.error {
+    background-color: var(--flash-error-bg);
+    border-color: var(--flash-error-border);
+    color: var(--flash-error-text);
+}
+
+/* Konten utama */
+main {
+    background-color: var(--card-bg);
+    padding: 2em;
+    margin-top: 1.5em;
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+}
+
+hr {
+    display: none; /* Garis <hr> tidak lagi diperlukan */
+}
+
+/* Membuat desain responsif di layar kecil */
+@media (max-width: 600px) {
+    nav {
+        flex-direction: column;
+        align-items: flex-start;
+        padding: 1em;
+    }
+    nav .nav-right {
+        margin-top: 1em;
+        width: 100%;
+        display: flex;
+        flex-direction: column;
+    }
+    nav .nav-right a {
+        margin-left: 0;
+        padding: 0.5em 0;
+    }
+    .container {
+        padding: 1em;
+    }
+    main {
+        padding: 1.5em;
+    }
+}
+
+
+/* ===== Gaya untuk Form Login & Register ===== */
+.form-container {
+    max-width: 450px;
+    margin: 2em auto; /* Pusatkan form secara horizontal */
+    padding: 2em;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: 8px;
+    box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+}
+
+.form-container h2 {
+    text-align: center;
+    margin-top: 0;
+    margin-bottom: 1.5em;
+    color: var(--text-color);
+}
+
+.form-group {
+    margin-bottom: 1.5em;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5em;
+    font-weight: 500;
+}
+
+.form-group input[type="text"],
+.form-group input[type="password"],
+.form-group input[type="email"] {
+    width: 100%;
+    padding: 0.8em;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    box-sizing: border-box; /* Penting agar padding tidak menambah lebar */
+    font-size: 1em;
+}
+
+button[type="submit"] {
+    width: 100%;
+    padding: 0.8em;
+    border: none;
+    background-color: var(--primary-color);
+    color: white;
+    font-size: 1.1em;
+    font-weight: bold;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.2s ease-in-out;
+}
+
+button[type="submit"]:hover {
+    background-color: var(--primary-hover);
+}
+
+/* Gaya untuk checkbox tampilkan password */
+.form-check {
+    display: flex;
+    align-items: center;
+    margin-top: -0.5em; /* Mengurangi sedikit jarak atas dari form-group sebelumnya */
+}
+
+.form-check input[type="checkbox"] {
+    margin-right: 0.5em;
+    width: auto; /* Kembalikan lebar ke otomatis */
+}
+
+.form-check label {
+    margin-bottom: 0; /* Hapus margin bawah dari label checkbox */
+    font-weight: normal;
+}
+
+/* Gaya untuk membungkus input password dan ikon */
+.password-wrapper {
+    position: relative; /* Diperlukan agar ikon bisa diposisikan secara absolut */
+    display: flex;
+    align-items: center;
+}
+
+/* Memposisikan ikon mata di dalam input */
+.toggle-password {
+    position: absolute;
+    right: 15px; /* Jarak dari sisi kanan input */
+    cursor: pointer;
+    user-select: none; /* Mencegah teks ikon terseleksi saat di-klik */
+    color: #888;
+}
+
+/* Gaya untuk tombol download */
+.download-container {
+    margin-bottom: 1.5em;
+    text-align: right;
+}
+.button-download {
+    display: inline-block;
+    padding: 0.6em 1.2em;
+    background-color: #198754; /* Warna hijau */
+    color: white;
+    text-decoration: none;
+    border-radius: 5px;
+    font-weight: bold;
+    transition: background-color 0.2s;
+}
+.button-download:hover {
+    background-color: #157347;
+}
+
+
+/* ===== Gaya untuk Animasi Loading ===== */
+
+/* Lapisan overlay yang menutupi form */
+#loader-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(255, 255, 255, 0.8); /* Latar belakang semi-transparan */
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    z-index: 10; /* Pastikan berada di atas elemen lain */
+    border-radius: 8px; /* Sesuaikan dengan border-radius .form-container */
+
+    /* Sembunyikan secara default */
+    display: none;
+}
+
+#loader-overlay p {
+    margin-top: 15px;
+    font-weight: 500;
+    color: #555;
+}
+
+/* Animasi spinner berputar */
+.spinner {
+    border: 6px solid #f3f3f3; /* Lingkaran abu-abu muda */
+    border-top: 6px solid var(--primary-color); /* Lingkaran biru di atas */
+    border-radius: 50%;
+    width: 50px;
+    height: 50px;
+    animation: spin 1s linear infinite; /* Terapkan animasi 'spin' */
+}
+
+/* Keyframes untuk animasi 'spin' */
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
