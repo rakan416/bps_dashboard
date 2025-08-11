@@ -168,6 +168,15 @@ def upload_file():
             try:
                 num_rows_deleted = Dashboard.query.delete()
                 print(num_rows_deleted)
+
+                chunksize = 1000
+                total_rows = len(df_main)
+
+                for start in range(0, total_rows, chunksize):
+                    end = min(start + chunksize, total_rows)
+                    chunk = df_main.iloc[start:end]
+
+                records = []
                 for index, row in df_main.iterrows():
                         # if str(row.get('id_x')) == 'nan':
                         #     continue
@@ -235,9 +244,10 @@ def upload_file():
                             total_muatan=row.get('TOTAL_MUATAN_(MAKS_BTT,KK_+_BTT_+BTTK_+_BBTT_NON_USAHA)'),
                             apakah_ada_perubahan_batas=row.get('APAKAH_ADA_PERUBAHAN_BATAS_PADA_SLS_TERSEBUT?')
                         )
+                        records.append(new_dashboard_data)
 
                         # print(new_dashboard_data)
-                        db.session.add(new_dashboard_data)
+                db.session.add(new_dashboard_data)
                 print('Penambahan Berhasil')
                 db.session.commit()
                 flash('File berhasil di-upload dan data telah diproses!', 'success')
