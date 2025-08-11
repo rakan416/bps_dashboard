@@ -114,144 +114,85 @@ def index():
 
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-
     if request.method == 'POST':
-        # 1. Cek apakah ada file di dalam request
-        # if 'file_excel' not in request.files:
-        #     flash('Tidak ada bagian file!', 'error')
-        #     return redirect(request.url)
-        
         file_alokasi = request.files['alokasi']
         file_landmark = request.files['landmark']
         file_rekap_lkm = request.files['rekap_lkm']
 
-        # 2. Cek apakah pengguna memilih file
         if file_landmark.filename == '':
             flash('Tidak ada file yang dipilih!', 'error')
             return redirect(request.url)
 
-        # 3. Cek apakah file valid dan memiliki ekstensi yang diizinkan
         if file_alokasi and allowed_file(file_alokasi.filename):
-            df_alokasi = pd.read_excel(file_alokasi, sheet_name=None, dtype=str)
-            KEC = df_alokasi['3519']['kdkec'].unique()
-            df_main = df_alokasi['3519'].drop(columns=['PEMETA', 'PENGAWAS', 'PENGOLAH']).copy()
-            all_kec = []
-            for k in KEC:
-                all_kec.append(df_alokasi[k][['id', 'PEMETA', 'EMAIL PEMETA', 'PENGAWAS', 'EMAIL PENGAWAS']])
-            df_all_kec = pd.concat(all_kec, ignore_index=True)
-            df_main = df_main.merge(df_all_kec, how='left', on='id')
-            print('Load file ALokasi Berhasil')
-            del df_all_kec, df_alokasi
-            df_main['idsls'] = df_main['idsubsls'].str.slice(0, 14)
-            df_main.rename(columns={'id':'id_alokasi'}, inplace=True)
-            df_landmark = pd.read_excel(file_landmark, dtype=str)
-            df_landmark['idsls'] = df_landmark['iddesa'] + df_landmark['nm_project']
-            df_landmark['latlon'] = df_landmark['latitude'] + ',' + df_landmark['longitude']
-            df_landmark.rename(columns={'id':'id_landmark'}, inplace=True)
-            df_landmark.drop(columns=['latitude', 'longitude'], inplace=True)
-            df_main = df_landmark.merge(df_main, how='outer', on='idsls')
-            print('Load file Landmark Berhasil')
-            del df_landmark
-            df_LKM = pd.read_excel(file_rekap_lkm, sheet_name='Form Responses 1', dtype=str)
-            df_LKM['idsls'] = '3519'+df_LKM['KODE SLS']
-            df_main = df_main.merge(df_LKM, on='idsls', how='outer')
-            print('Load file REKAP LKM Berhasil')
-            del df_LKM
-            kolom = df_main.columns
-            for col in kolom:
-                if ' ' in str(col):
-                    new_col = col.replace(' ', '_')
-                    df_main.rename(columns={col:new_col}, inplace=True)
-            df_main.reset_index(drop=True, inplace=True)
-            print('Transformasi file Berhasil')
-
             try:
-                num_rows_deleted = Dashboard.query.delete()
-                print(num_rows_deleted)
-                for index, row in df_main.iterrows():
-                        # if str(row.get('id_x')) == 'nan':
-                        #     continue
+                # === BACA FILE HANYA SHEET YANG DIPERLUKAN ===
+                df_3519 = pd.read_excel(file_alokasi, sheet_name='3519', dtype=str)
+                kec_list = df_3519['kdkec'].unique()
 
-                        new_dashboard_data = Dashboard(
-                            id=index,
-                            id_landmark=row.get('id_landmark'),
-                            id_alokasi=row.get('id_alokasi'),
-                            wid=row.get('wid'),
-                            nama=row.get('nama'),
-                            nm_project=row.get('nm_project'),
-                            deskripsi_project=row.get('deskripsi_project'),
-                            iddesa=row.get('iddesa'),
-                            accuracy=row.get('accuracy'),
-                            status=row.get('status'),
-                            kode_kategori=row.get('kode_kategori'),
-                            kategori_landmark=row.get('kategori_landmark'),
-                            kode_landmark_tipe=row.get('kode_landmark_tipe'),
-                            tipe_landmark=row.get('tipe_landmark'),
-                            user_created_at=row.get('user_created_at'),
-                            user_upload_at=row.get('user_upload_at'),
-                            user_creator_nama=row.get('user_creator_nama'),
-                            photo_url=row.get('photo_url'),
-                            idsls=row.get('idsls'),
-                            latlon=row.get('latlon'),
-                            semester=row.get('semester'),
-                            idsubsls=row.get('idsubsls'),
-                            nmsls=row.get('nmsls'),
-                            nama_ketua=row.get('nama_ketua'),
-                            jenis=row.get('jenis'),
-                            kdprov=row.get('kdprov'),
-                            nmprov=row.get('nmprov'),
-                            kdkab=row.get('kdkab'),
-                            nmkab=row.get('nmkab'),
-                            kdkec=row.get('kdkec'),
-                            nmkec=row.get('nmkec'),
-                            kddesa=row.get('kddesa'),
-                            nmdesa=row.get('nmdesa'),
-                            klas=row.get('klas'),
-                            kdsls=row.get('kdsls'),
-                            kdsubsls=row.get('kdsubsls'),
-                            jumlah_kk=row.get('jumlah_kk'),
-                            jumlah_bstt=row.get('jumlah_bstt'),
-                            jumlah_bsbtt=row.get('jumlah_bsbtt'),
-                            jumlah_bsttk=row.get('jumlah_bsttk'),
-                            jumlah_bskeko=row.get('jumlah_bskeko'),
-                            dominan=row.get('dominan'),
-                            pemeta=row.get('PEMETA'),
-                            email_pemeta=row.get('EMAIL_PEMETA'),
-                            pengawas=row.get('PENGAWAS'),
-                            email_pengawas=row.get('EMAIL_PENGAWAS'),
-                            timestamp=row.get('Timestamp'),
-                            kode_kecamatan=row.get('KODE_KECAMATAN'),
-                            kode_desa=row.get('KODE_DESA'),
-                            kode_sls_non_sls=row.get('KODE_SLS/NON_SLS'),
-                            kode_sls=row.get('KODE_SLS'),
-                            nama_sls_non_sls=row.get('NAMA_SLS_/_NON_SLS_(contoh:_RT_001_RW_001)'),
-                            perkiraan_jumlah_muatan_kk=row.get('PERKIRAAN_JUMLAH_MUATAN_KK'),
-                            perkiraan_jumlah_usaha=row.get('PERKIRAAN_JUMLAH_USAHA_INFO_DARI_PAK_RT'),
-                            jumlah_bangunan_tempat_tinggal=row.get('JUMLAH_BANGUNAN_TEMPAT_TINGGAL_(BTT)'),
-                            jumlah_bangunan_tempat_tinggal_kosong=row.get('JUMLAH_BANGUNAN_TEMPAT_TINGGAL_KOSONG_(BTT_KOSONG)'),
-                            jumlah_bangunan_khusus_usaha=row.get('JUMLAH_BANGUNAN_KHUSUS_USAHA_(BKU)'),
-                            jumlah_bangunan_bukan_tempat_tinggal=row.get('JUMLAH_BANGUNAN_BUKAN_TEMPAT_TINGGAL_(BBTT_NON_USAHA)'),
-                            perkiraan_jumlah_muatan_usaha=row.get('PERKIRAAN_JUMLAH_MUATAN_USAHA'),
-                            total_muatan=row.get('TOTAL_MUATAN_(MAKS_BTT,KK_+_BTT_+BTTK_+_BBTT_NON_USAHA)'),
-                            apakah_ada_perubahan_batas=row.get('APAKAH_ADA_PERUBAHAN_BATAS_PADA_SLS_TERSEBUT?')
-                        )
+                all_kec = [
+                    pd.read_excel(file_alokasi, sheet_name=str(k), dtype=str)[
+                        ['id', 'PEMETA', 'EMAIL PEMETA', 'PENGAWAS', 'EMAIL PENGAWAS']
+                    ]
+                    for k in kec_list
+                ]
+                df_all_kec = pd.concat(all_kec, ignore_index=True)
 
-                        # print(new_dashboard_data)
-                        db.session.add(new_dashboard_data)
-                print('Penambahan Berhasil')
+                df_main = (
+                    df_3519.drop(columns=['PEMETA', 'PENGAWAS', 'PENGOLAH'])
+                    .merge(df_all_kec, how='left', on='id')
+                )
+                df_main['idsls'] = df_main['idsubsls'].str.slice(0, 14)
+                df_main.rename(columns={'id': 'id_alokasi'}, inplace=True)
+                del df_3519, df_all_kec
+
+                # === LANDMARK ===
+                df_landmark = pd.read_excel(file_landmark, dtype=str)
+                df_landmark['idsls'] = df_landmark['iddesa'] + df_landmark['nm_project']
+                df_landmark['latlon'] = df_landmark['latitude'] + ',' + df_landmark['longitude']
+                df_landmark.rename(columns={'id': 'id_landmark'}, inplace=True)
+                df_landmark.drop(columns=['latitude', 'longitude'], inplace=True)
+
+                df_main = df_landmark.merge(df_main, how='outer', on='idsls')
+                del df_landmark
+
+                # === REKAP LKM ===
+                df_LKM = pd.read_excel(file_rekap_lkm, sheet_name='Form Responses 1', dtype=str)
+                df_LKM['idsls'] = '3519' + df_LKM['KODE SLS']
+
+                df_main = df_main.merge(df_LKM, on='idsls', how='outer')
+                del df_LKM
+
+                # === BERSIHKAN KOLOM ===
+                df_main.columns = [c.replace(' ', '_') for c in df_main.columns]
+                df_main.reset_index(drop=True, inplace=True)
+
+                # === OPTIMASI TIPE DATA SEBELUM INSERT ===
+                # contoh: ubah kolom numerik dari string → int (bila memungkinkan)
+                numeric_cols = ['jumlah_kk', 'jumlah_bstt', 'jumlah_bsbtt']
+                for col in numeric_cols:
+                    if col in df_main.columns:
+                        df_main[col] = pd.to_numeric(df_main[col], errors='coerce').fillna(0).astype(int)
+
+                # === CLEAR TABEL LAMA ===
+                db.session.query(Dashboard).delete()
                 db.session.commit()
+
+                # === BULK INSERT ===
+                records = df_main.to_dict(orient='records')
+                db.session.bulk_insert_mappings(Dashboard, records)
+                db.session.commit()
+
                 flash('File berhasil di-upload dan data telah diproses!', 'success')
                 return redirect(url_for('upload_file'))
 
             except Exception as e:
-                # Jika terjadi error saat memproses file (misal, nama kolom salah)
                 flash(f'Terjadi error saat memproses file: {e}', 'error')
                 return redirect(request.url)
+
         else:
             flash('Tipe file tidak diizinkan!', 'error')
             return redirect(request.url)
 
-    # Jika metodenya GET, tampilkan halaman upload
     return render_template('upload.html')
 
 if __name__ == '__main__':
