@@ -140,6 +140,7 @@ def upload_file():
                 all_kec.append(df_alokasi[k][['id', 'PEMETA', 'EMAIL PEMETA', 'PENGAWAS', 'EMAIL PENGAWAS']])
             df_all_kec = pd.concat(all_kec, ignore_index=True)
             df_main = df_main.merge(df_all_kec, how='left', on='id')
+            print('Load file ALokasi Berhasil')
             del df_all_kec, df_alokasi
             df_main['idsls'] = df_main['idsubsls'].str.slice(0, 14)
             df_main.rename(columns={'id':'id_alokasi'}, inplace=True)
@@ -149,10 +150,12 @@ def upload_file():
             df_landmark.rename(columns={'id':'id_landmark'}, inplace=True)
             df_landmark.drop(columns=['latitude', 'longitude'], inplace=True)
             df_main = df_landmark.merge(df_main, how='outer', on='idsls')
+            print('Load file Landmark Berhasil')
             del df_landmark
             df_LKM = pd.read_excel(file_rekap_lkm, sheet_name='Form Responses 1', dtype=str)
             df_LKM['idsls'] = '3519'+df_LKM['KODE SLS']
             df_main = df_main.merge(df_LKM, on='idsls', how='outer')
+            print('Load file REKAP LKM Berhasil')
             del df_LKM
             kolom = df_main.columns
             for col in kolom:
@@ -160,6 +163,7 @@ def upload_file():
                     new_col = col.replace(' ', '_')
                     df_main.rename(columns={col:new_col}, inplace=True)
             df_main.reset_index(drop=True, inplace=True)
+            print('Transformasi file Berhasil')
 
             try:
                 num_rows_deleted = Dashboard.query.delete()
@@ -234,7 +238,7 @@ def upload_file():
 
                         # print(new_dashboard_data)
                         db.session.add(new_dashboard_data)
-
+                print('Penambahan Berhasil')
                 db.session.commit()
                 flash('File berhasil di-upload dan data telah diproses!', 'success')
                 return redirect(url_for('upload_file'))
