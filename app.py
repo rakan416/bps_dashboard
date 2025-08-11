@@ -132,33 +132,36 @@ def upload_file():
 
         # 3. Cek apakah file valid dan memiliki ekstensi yang diizinkan
         if file_alokasi and allowed_file(file_alokasi.filename):
-            try:
-                df_alokasi = pd.read_excel(file_alokasi, sheet_name=None, dtype=str)
-                KEC = df_alokasi['3519']['kdkec'].unique()
-                df_main = df_alokasi['3519'].drop(columns=['PEMETA', 'PENGAWAS', 'PENGOLAH']).copy()
-                all_kec = []
-                for k in KEC:
-                    all_kec.append(df_alokasi[k][['id', 'PEMETA', 'EMAIL PEMETA', 'PENGAWAS', 'EMAIL PENGAWAS']])
-                df_all_kec = pd.concat(all_kec, ignore_index=True)
-                df_main = df_main.merge(df_all_kec, how='left', on='id')
-                df_main['idsls'] = df_main['idsubsls'].str.slice(0, 14)
-                df_main.rename(columns={'id':'id_alokasi'}, inplace=True)
-                df_landmark = pd.read_excel(file_landmark, dtype=str)
-                df_landmark['idsls'] = df_landmark['iddesa'] + df_landmark['nm_project']
-                df_landmark['latlon'] = df_landmark['latitude'] + ',' + df_landmark['longitude']
-                df_landmark.rename(columns={'id':'id_landmark'}, inplace=True)
-                df_landmark.drop(columns=['latitude', 'longitude'], inplace=True)
-                df_main = df_landmark.merge(df_main, how='outer', on='idsls')
-                df_LKM = pd.read_excel(file_rekap_lkm, sheet_name='Form Responses 1', dtype=str)
-                df_LKM['idsls'] = '3519'+df_LKM['KODE SLS']
-                df_main = df_main.merge(df_LKM, on='idsls', how='outer')
-                kolom = df_main.columns
-                for col in kolom:
-                    if ' ' in str(col):
-                        new_col = col.replace(' ', '_')
-                        df_main.rename(columns={col:new_col}, inplace=True)
-                df_main.reset_index(drop=True, inplace=True)
+            df_alokasi = pd.read_excel(file_alokasi, sheet_name=None, dtype=str)
+            KEC = df_alokasi['3519']['kdkec'].unique()
+            df_main = df_alokasi['3519'].drop(columns=['PEMETA', 'PENGAWAS', 'PENGOLAH']).copy()
+            all_kec = []
+            for k in KEC:
+                all_kec.append(df_alokasi[k][['id', 'PEMETA', 'EMAIL PEMETA', 'PENGAWAS', 'EMAIL PENGAWAS']])
+            df_all_kec = pd.concat(all_kec, ignore_index=True)
+            df_main = df_main.merge(df_all_kec, how='left', on='id')
+            del df_all_kec, df_alokasi
+            df_main['idsls'] = df_main['idsubsls'].str.slice(0, 14)
+            df_main.rename(columns={'id':'id_alokasi'}, inplace=True)
+            df_landmark = pd.read_excel(file_landmark, dtype=str)
+            df_landmark['idsls'] = df_landmark['iddesa'] + df_landmark['nm_project']
+            df_landmark['latlon'] = df_landmark['latitude'] + ',' + df_landmark['longitude']
+            df_landmark.rename(columns={'id':'id_landmark'}, inplace=True)
+            df_landmark.drop(columns=['latitude', 'longitude'], inplace=True)
+            df_main = df_landmark.merge(df_main, how='outer', on='idsls')
+            del df_landmark
+            df_LKM = pd.read_excel(file_rekap_lkm, sheet_name='Form Responses 1', dtype=str)
+            df_LKM['idsls'] = '3519'+df_LKM['KODE SLS']
+            df_main = df_main.merge(df_LKM, on='idsls', how='outer')
+            del df_LKM
+            kolom = df_main.columns
+            for col in kolom:
+                if ' ' in str(col):
+                    new_col = col.replace(' ', '_')
+                    df_main.rename(columns={col:new_col}, inplace=True)
+            df_main.reset_index(drop=True, inplace=True)
 
+            try:
                 num_rows_deleted = Dashboard.query.delete()
                 print(num_rows_deleted)
                 for index, row in df_main.iterrows():
