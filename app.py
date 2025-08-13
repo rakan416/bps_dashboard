@@ -77,19 +77,20 @@ def upload_file():
             df_main.columns = [c.replace(' ', '_') for c in df_main.columns]
             df_main.reset_index(drop=True, inplace=True)
             df_main = df_main.replace({np.nan: None, np.inf: None, -np.inf: None})
+            df_main.reset_index(inplace=True)
+            df_main.rename(columns={'index':'id'})
 
             try:
                 # Hapus semua data lama
-                supabase.table("data_dashboard").delete().neq("id_data", 0).execute()
+                supabase.table("data_dashboard").delete().execute()
                 print('Deletion Berhasil')
 
                 # Insert batch ke Supabase
                 data_to_insert = df_main.to_dict(orient='records')
-                batch_size = 500  # Supabase API batas batch sekitar 1MB, jadi aman dibagi
+                batch_size = 500
 
                 for i in range(0, len(data_to_insert), batch_size):
                     supabase.table("data_dashboard").insert(data_to_insert[i:i+batch_size]).execute()
-                    print('50 input berhasil')
 
                 flash(f'Berhasil mengunggah {len(df_main)} data ke Supabase!', 'success')
                 return redirect(url_for('upload_file'))
