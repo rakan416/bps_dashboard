@@ -1,30 +1,25 @@
 from flask import Flask, render_template, request, redirect, url_for, session, flash, send_file
 from flask_sqlalchemy import SQLAlchemy # Impor SQLAlchemy
-from werkzeug.utils import secure_filename
-from sqlalchemy.sql import func
 import pandas as pd
 import os
 import io
+from dotenv import load_dotenv
 
+load_dotenv()
 
 app = Flask(__name__)
-app.secret_key = os.urandom(24)
+app.secret_key = os.getenv("SECRET_KEY", os.urandom(24))
 
 # --- KONFIGURASI DATABASE ---
-# Format URI: postgresql://[user]:[password]@[host]:[port]/[dbname]
-# Ganti dengan detail database Anda
-link_DB = 'postgresql://postgres.rvlsrtvgpnvevbhzmgik:medalion19@aws-0-ap-southeast-1.pooler.supabase.com:5432/postgres'
-app.config['SQLALCHEMY_DATABASE_URI'] = link_DB
-app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False # Opsional, untuk menonaktifkan notifikasi yang tidak perlu
+app.config['SQLALCHEMY_DATABASE_URI'] = os.getenv("DATABASE_URL")
+app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 # Inisialisasi objek database
 db = SQLAlchemy(app)
 
 class Dashboard(db.Model):
-    # Ganti 'nama_tabel_dashboard' dengan nama tabel Anda yang sebenarnya di PostgreSQL
     __tablename__ = 'data_dashboard'
 
-    # Asumsi 'id' adalah Primary Key
     id = db.Column('id_data', db.Integer, primary_key=True)
 
     id_landmark = db.Column('id_landmark', db.String, nullable=True)
@@ -105,11 +100,9 @@ def allowed_file(filename):
 def index():
     print('AKU CINTA MADIUN')
     try:
-        # Jalankan query sederhana
         db.session.execute(db.text('SELECT 1'))
         return redirect(url_for('upload_file'))
     except Exception as e:
-        # Jika terjadi error, tampilkan pesan errornya
         return f'<h1>Koneksi ke database gagal.</h1><p>Error: {e}</p>'
 
 

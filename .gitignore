@@ -3,3 +3,4 @@ data
 etl_venv
 analisis.ipynb
 SUPABASE PREP.txt
+.env
