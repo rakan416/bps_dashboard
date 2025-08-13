@@ -103,6 +103,7 @@ def allowed_file(filename):
 
 @app.route('/')
 def index():
+    print('AKU CINTA MADIUN')
     try:
         # Jalankan query sederhana
         db.session.execute(db.text('SELECT 1'))
@@ -115,7 +116,7 @@ def index():
 @app.route('/upload', methods=['GET', 'POST'])
 @app.route('/upload', methods=['GET', 'POST'])
 def upload_file():
-
+    print("BPS KESAYANGANKU")
     if request.method == 'POST':
         # 1. Cek apakah ada file di dalam request
         # if 'file_excel' not in request.files:
@@ -170,6 +171,7 @@ def upload_file():
             try:
                 num_rows_deleted = Dashboard.query.delete()
                 print(num_rows_deleted)
+                tot = 0
                 for index, row in df_main.iterrows():
                         # if str(row.get('id_x')) == 'nan':
                         #     continue
@@ -240,9 +242,10 @@ def upload_file():
 
                         # print(new_dashboard_data)
                         db.session.add(new_dashboard_data)
+                        tot += 1
                 print('Penambahan Berhasil')
                 db.session.commit()
-                flash('File berhasil di-upload dan data telah diproses!', 'success')
+                flash(f'Berhasil mengunggah {tot} data!', 'success')
                 return redirect(url_for('upload_file'))
 
             except Exception as e:
